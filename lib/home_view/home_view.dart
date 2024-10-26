@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:practical_task/Model/post_data.dart';
+import 'package:practical_task/Models/post_data.dart';
 import 'package:practical_task/components/components.dart';
 import 'package:practical_task/home_view/api_call/api_call.dart';
-import 'package:practical_task/home_view/time_list/time_list_bloc.dart';
+import 'package:practical_task/home_view/time_range_list/time_range_list.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -13,7 +13,7 @@ class HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => TimeListBloc()),
+        BlocProvider(create: (context) => TimeRangeListBloc(context: context)),
         BlocProvider(create: (context) => ApiCallBloc(context: context)),
       ],
       child: BlocListener<ApiCallBloc, ApiCallState>(
@@ -21,6 +21,7 @@ class HomeView extends StatelessWidget {
           if (state is ApiCallSuccessState) {
             await showDialog(
               context: context,
+              barrierDismissible: false,
               builder: (context) => _ResponseDialog(data: state.postData),
             );
           }
@@ -43,18 +44,23 @@ class _HomeViewState extends State<_HomeView> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        minimum: const EdgeInsets.all(Spacing.normal),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            const _IntroContent(),
-            const Gap(Spacing.normal),
-            const _ListContent(),
-            ElevatedButton(
-              onPressed: () => context.read<ApiCallBloc>().add(const ApiCallRequested()),
-              child: const Text('Submit'),
-            )
-          ],
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(Spacing.normal, Spacing.none, Spacing.normal, Spacing.normal),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Gap(Spacing.normal),
+              const _IntroContent(),
+              const Gap(Spacing.normal),
+              const _ListContent(),
+              const Gap(Spacing.normal),
+              ElevatedButton(
+                onPressed: () => context.read<ApiCallBloc>().add(const ApiCallRequested()),
+                child: const Text('Submit'),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -145,25 +151,86 @@ class _ListContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: ListView.separated(
-        padding: EdgeInsets.zero,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: dayList.length,
-        itemBuilder: (context, index) => ListTile(
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(RadiusValues.medium),
-            side: BorderSide(color: Colors.black),
-          ),
-          leading: Text(dayList[index]),
-          trailing: ElevatedButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.add),
-            label: const Text('Add'),
-          ),
+    final textTheme = Theme.of(context).textTheme;
+    return ListView.separated(
+      padding: EdgeInsets.zero,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: Days.values.length,
+      itemBuilder: (context, index) {
+        final days = Days.values[index];
+        return Container(
+        padding: const EdgeInsets.symmetric(vertical: Spacing.small, horizontal: Spacing.normal),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.black),
+          borderRadius: const BorderRadius.all(RadiusValues.medium),
         ),
-        separatorBuilder: (context, index) => const Gap(Spacing.normal),
-      ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                Expanded(child: Text(days.getLabel(context), style: textTheme.bodyLarge)),
+                ElevatedButton.icon(
+                  onPressed: () => context.read<TimeRangeListBloc>().add(
+                        TimeRangeAddEvent(
+                          day: days,
+                          timeData: TimeData(
+                            fromTime: TimeOfDay.now(),
+                            toTime: TimeOfDay.now(),
+                          ),
+                        ),
+                      ),
+                  icon: const Icon(Icons.add),
+                  label: const Text('Add'),
+                ),
+              ],
+            ),
+            BlocSelector<TimeRangeListBloc, TimeRangeListState, List<TimeData>>(
+              selector: (state) {
+                return switch (days) {
+                  Days.monday => state.mondayTimeData,
+                  Days.tuesday => state.tuesdayTimeData,
+                  Days.wednesday => state.wednesdayTimeData,
+                  Days.thursday => state.thursdayTimeData,
+                  Days.friday => state.fridayTimeData,
+                  Days.saturday => state.saturdayTimeData,
+                  Days.sunday => state.sundayTimeData,
+                };
+              },
+              builder: (context, state) => Wrap(
+                children: [
+                  ...state.map(
+                    (e) {
+                      if (state.isEmpty) return const SizedBox.shrink();
+                      return Container(
+                        decoration: const BoxDecoration(
+                          color: Colors.grey,
+                          borderRadius: BorderRadius.all(RadiusValues.normal),
+                        ),
+                        padding: const EdgeInsetsDirectional.only(start: Spacing.small),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              "${e.fromTime?.hour}:${e.fromTime?.minute}-${e.toTime?.hour}:${e.toTime?.minute}",
+                              style: textTheme.bodyMedium?.copyWith(color: Colors.white),
+                            ),
+                            const Gap(4),
+                            const Icon(Icons.close, color: Colors.white, size: 20),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+      },
+      separatorBuilder: (context, index) => const Gap(Spacing.normal),
     );
   }
 }
@@ -188,10 +255,8 @@ class _ResponseDialog extends StatelessWidget {
               borderRadius: BorderRadius.only(topRight: RadiusValues.medium, topLeft: RadiusValues.medium),
             ),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Post Data", style: textTheme.titleLarge),
+                Expanded(child: Text("Post Data", style: textTheme.titleLarge)),
                 IconButton(
                   onPressed: () => Navigator.of(context).pop(),
                   icon: const Icon(Icons.close, color: Colors.black),

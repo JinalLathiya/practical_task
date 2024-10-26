@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:practical_task/Model/post_data.dart';
+import 'package:practical_task/Models/post_data.dart';
 
 sealed class ApiCallState extends Equatable {
   const ApiCallState();
