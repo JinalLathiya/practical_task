@@ -17,9 +17,9 @@ class TimeRangeAddEvent extends TimeRangeListEvent {
 class TimeRangeRemoved extends TimeRangeListEvent {
   const TimeRangeRemoved({
     required this.day,
-    required this.timeData,
+    required this.index,
   });
 
   final Days day;
-  final TimeData timeData;
+  final int index;
 }

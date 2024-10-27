@@ -172,65 +172,205 @@ class _ListContent extends StatelessWidget {
               children: [
                 Expanded(child: Text(days.getLabel(context), style: textTheme.bodyLarge)),
                 ElevatedButton.icon(
-                  onPressed: () => context.read<TimeRangeListBloc>().add(
-                        TimeRangeAddEvent(
-                          day: days,
-                          timeData: TimeData(
-                            fromTime: TimeOfDay.now(),
-                            toTime: TimeOfDay.now(),
-                          ),
+                    onPressed: () async {
+                      final bloc = context.read<TimeRangeListBloc>();
+                      await showDialog(
+                        context: context,
+                        builder: (context) => BlocProvider.value(
+                          value: bloc,
+                          child: _SelectTimeRangeDialog(days: days),
                         ),
-                      ),
-                  icon: const Icon(Icons.add),
-                  label: const Text('Add'),
-                ),
-              ],
-            ),
-            BlocSelector<TimeRangeListBloc, TimeRangeListState, List<TimeData>>(
-              selector: (state) {
-                return switch (days) {
-                  Days.monday => state.mondayTimeData,
-                  Days.tuesday => state.tuesdayTimeData,
-                  Days.wednesday => state.wednesdayTimeData,
+                      );
+                    },
+                    icon: const Icon(Icons.add),
+                    label: const Text('Add'),
+                  ),
+                ],
+              ),
+              BlocSelector<TimeRangeListBloc, TimeRangeListState, List<TimeData>>(
+                selector: (state) {
+                  return switch (days) {
+                    Days.monday => state.mondayTimeData,
+                    Days.tuesday => state.tuesdayTimeData,
+                    Days.wednesday => state.wednesdayTimeData,
                   Days.thursday => state.thursdayTimeData,
                   Days.friday => state.fridayTimeData,
                   Days.saturday => state.saturdayTimeData,
                   Days.sunday => state.sundayTimeData,
                 };
               },
-              builder: (context, state) => Wrap(
+                builder: (context, state) => Wrap(
+                  spacing: Spacing.normal,
+                  children: [
+                    ...state.map(
+                      (e) {
+                        if (state.isEmpty) return const SizedBox.shrink();
+                        return Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.grey,
+                            borderRadius: BorderRadius.all(RadiusValues.normal),
+                          ),
+                          padding: const EdgeInsetsDirectional.all(Spacing.small),
+                          margin: const EdgeInsetsDirectional.only(top: Spacing.small),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                "${e.startTime?.format(context)} - ${e.endTime?.format(context)}",
+                                style: textTheme.bodyMedium?.copyWith(color: Colors.white),
+                              ),
+                              const Gap(4),
+                              InkWell(
+                                onTap: () {
+                                  final index = state.indexWhere((element) => element == e);
+                                  if (!index.isNegative) {
+                                    context.read<TimeRangeListBloc>().add(
+                                          TimeRangeRemoved(
+                                            day: days,
+                                            index: index,
+                                          ),
+                                        );
+                                  }
+                                },
+                                child: const Icon(Icons.close, color: Colors.white, size: 20),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+      separatorBuilder: (context, index) => const Gap(Spacing.normal),
+    );
+  }
+}
+
+class _SelectTimeRangeDialog extends StatefulWidget {
+  final Days days;
+
+  const _SelectTimeRangeDialog({required this.days});
+
+  @override
+  State<_SelectTimeRangeDialog> createState() => _SelectTimeRangeDialogState();
+}
+
+class _SelectTimeRangeDialogState extends State<_SelectTimeRangeDialog> {
+  final GlobalKey<FormState> _formKey = GlobalKey();
+  final TextEditingController _startTimeController = TextEditingController();
+  final TextEditingController _endTimeController = TextEditingController();
+  TimeOfDay? startTime = TimeOfDay.now();
+  TimeOfDay? endTime = TimeOfDay.now();
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    return Dialog(
+      shape: const RoundedRectangleBorder(borderRadius: ShapeBorderRadius.medium),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsetsDirectional.only(start: Spacing.normal),
+            decoration: const BoxDecoration(
+              color: Colors.amber,
+              borderRadius: BorderRadius.only(topRight: RadiusValues.medium, topLeft: RadiusValues.medium),
+            ),
+            child: Row(
+              children: [
+                Expanded(child: Text("Select Time", style: textTheme.titleLarge)),
+                IconButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(Icons.close, color: Colors.black),
+                ),
+              ],
+            ),
+          ),
+          Form(
+            key: _formKey,
+            child: Padding(
+              padding: const EdgeInsets.all(Spacing.normal),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  ...state.map(
-                    (e) {
-                      if (state.isEmpty) return const SizedBox.shrink();
-                      return Container(
-                        decoration: const BoxDecoration(
-                          color: Colors.grey,
-                          borderRadius: BorderRadius.all(RadiusValues.normal),
-                        ),
-                        padding: const EdgeInsetsDirectional.only(start: Spacing.small),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text(
-                              "${e.fromTime?.hour}:${e.fromTime?.minute}-${e.toTime?.hour}:${e.toTime?.minute}",
-                              style: textTheme.bodyMedium?.copyWith(color: Colors.white),
-                            ),
-                            const Gap(4),
-                            const Icon(Icons.close, color: Colors.white, size: 20),
-                          ],
-                        ),
-                      );
+                  TimeInputField(
+                    controller: _startTimeController,
+                    hintText: "Select From Time",
+                    suffixWidget: IconButton(
+                      onPressed: () async {
+                        TimeOfDay? startTimeResult = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.now(),
+                        );
+                        if (startTimeResult != null && context.mounted) {
+                          _startTimeController.text = startTimeResult.format(context);
+                          startTime = startTimeResult;
+                        }
+                      },
+                      icon: const Icon(Icons.calendar_month_rounded),
+                    ),
+                    validator: (value) {
+                      value = value?.trim() ?? '';
+                      if (value.isEmpty) return 'Please Select Start Time!';
+                      return null;
                     },
                   ),
+                  const Gap(Spacing.normal),
+                  TimeInputField(
+                    controller: _endTimeController,
+                    hintText: "Select End Time",
+                    suffixWidget: IconButton(
+                      onPressed: () async {
+                        TimeOfDay? endTimeResult = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.now(),
+                        );
+                        if (endTimeResult != null && context.mounted) {
+                          _endTimeController.text = endTimeResult.format(context);
+                          endTime = endTimeResult;
+                        }
+                      },
+                      icon: const Icon(Icons.calendar_month_rounded),
+                    ),
+                    validator: (value) {
+                      int startTimeInMinute = (startTime?.hour)! * 60 + (startTime!.minute);
+                      int endTimeInMinute = (endTime?.hour)! * 60 + (endTime!.minute);
+                      final compareValue = startTimeInMinute - endTimeInMinute;
+                      value = value?.trim() ?? '';
+                      if (value.isEmpty) return 'Please Select End Time!';
+                      if (!compareValue.isNegative) return 'End time must be after ${startTime?.format(context)}!';
+                      return null;
+                    },
+                  ),
+                  const Gap(Spacing.normal),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState?.validate() != true) return;
+                      context.read<TimeRangeListBloc>().add(
+                            TimeRangeAddEvent(
+                              day: widget.days,
+                              timeData: TimeData(
+                                startTime: startTime,
+                                endTime: endTime,
+                              ),
+                            ),
+                          );
+                      if (context.mounted) return Navigator.of(context).pop();
+                    },
+                    child: const Text("Save"),
+                  )
                 ],
               ),
             ),
-          ],
-        ),
-      );
-      },
-      separatorBuilder: (context, index) => const Gap(Spacing.normal),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -17,6 +17,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         textTheme: _textTheme(),
         elevatedButtonTheme: _elevatedButtonThemeData(),
+        inputDecorationTheme: _inputDecorationTheme(),
       ),
       home: const HomeView(),
     );
@@ -43,6 +44,62 @@ class MyApp extends StatelessWidget {
         shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(RadiusValues.small)),
         padding: const EdgeInsets.symmetric(vertical: Spacing.small, horizontal: Spacing.normal),
       ),
+    );
+  }
+
+  InputDecorationTheme _inputDecorationTheme() {
+    final iconColor = WidgetStateColor.resolveWith((states) {
+      if (states.contains(WidgetState.error)) return Colors.redAccent;
+      if (states.contains(WidgetState.focused)) return Colors.amber;
+      return const Color(0xFF6E7B8B);
+    });
+
+    final border = MaterialStateOutlineInputBorder.resolveWith((states) {
+      const defaultBorder = OutlineInputBorder(
+        borderRadius: ShapeBorderRadius.small,
+        borderSide: BorderSide(color: Colors.black45),
+      );
+
+      if (states.contains(WidgetState.error)) {
+        if (states.contains(WidgetState.hovered)) {
+          return defaultBorder.copyWith(
+            borderSide: const BorderSide(color: Colors.redAccent, width: 2.0),
+          );
+        }
+        if (states.contains(WidgetState.focused)) {
+          return defaultBorder.copyWith(
+            borderSide: const BorderSide(color: Colors.redAccent, width: 2.0),
+          );
+        }
+        return defaultBorder.copyWith(
+          borderSide: const BorderSide(color: Colors.redAccent),
+        );
+      }
+      if (states.contains(WidgetState.hovered)) {
+        return defaultBorder.copyWith(
+          borderSide: BorderSide(color: Colors.amber.withOpacity(0.6), width: 2.0),
+        );
+      }
+      if (states.contains(WidgetState.focused)) {
+        return defaultBorder.copyWith(
+          borderSide: const BorderSide(color: Colors.amber, width: 2.0),
+        );
+      }
+      return defaultBorder;
+    });
+
+    return InputDecorationTheme(
+      errorMaxLines: 3,
+      helperMaxLines: 3,
+      hintStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 18, color: Colors.black38),
+      errorStyle: const TextStyle(fontWeight: FontWeight.w500),
+      helperStyle: const TextStyle(fontWeight: FontWeight.w500),
+      contentPadding: const EdgeInsets.symmetric(horizontal: Spacing.normal, vertical: Spacing.normal),
+      border: border,
+      filled: false,
+      suffixIconColor: iconColor,
+      prefixIconColor: iconColor,
+      floatingLabelBehavior: FloatingLabelBehavior.always,
     );
   }
 }

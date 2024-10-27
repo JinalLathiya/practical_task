@@ -30,16 +30,36 @@ class TimeRangeListState extends Equatable {
         saturdayTimeData,
         sundayTimeData,
       ];
+
+  TimeRangeListState copyWith({
+    List<TimeData>? mondayTimeData,
+    List<TimeData>? tuesdayTimeData,
+    List<TimeData>? wednesdayTimeData,
+    List<TimeData>? thursdayTimeData,
+    List<TimeData>? fridayTimeData,
+    List<TimeData>? saturdayTimeData,
+    List<TimeData>? sundayTimeData,
+  }) {
+    return TimeRangeListState(
+      mondayTimeData: mondayTimeData ?? this.mondayTimeData,
+      tuesdayTimeData: tuesdayTimeData ?? this.tuesdayTimeData,
+      wednesdayTimeData: wednesdayTimeData ?? this.wednesdayTimeData,
+      thursdayTimeData: thursdayTimeData ?? this.thursdayTimeData,
+      fridayTimeData: fridayTimeData ?? this.fridayTimeData,
+      saturdayTimeData: saturdayTimeData ?? this.saturdayTimeData,
+      sundayTimeData: sundayTimeData ?? this.sundayTimeData,
+    );
+  }
 }
 
 class TimeData {
   const TimeData({
-    required this.fromTime,
-    required this.toTime,
+    required this.startTime,
+    required this.endTime,
   });
 
-  final TimeOfDay? fromTime;
-  final TimeOfDay? toTime;
+  final TimeOfDay? startTime;
+  final TimeOfDay? endTime;
 }
 
 enum Days {
