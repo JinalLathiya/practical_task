@@ -7,6 +7,7 @@ import 'package:practical/src/presentation/ui/home/home_view.dart';
 import 'package:practical/src/presentation/ui/language_selection/language_selection_view.dart';
 import 'package:practical/src/presentation/ui/language_selection/logic/localization_bloc.dart';
 import 'package:practical/src/presentation/ui/login/login_view.dart';
+import 'package:practical/src/presentation/ui/splash/splash_screen_view.dart';
 
 import 'boostrap.dart';
 import 'src/presentation/ui/language_selection/logic/localization_state.dart';
@@ -31,7 +32,7 @@ class MyApp extends StatelessWidget {
       supportedLocales: AppLocalizations.delegate.supportedLocales,
       initialRoute: '/',
       routes: {
-        '/': (context) => const LoginView(),
+        '/': (context) => const SplashView(),
         '/language-selection': (context) => const LanguageSelectionView(),
         '/login': (context) => const LoginView(),
         '/home': (context) => const HomeView(),

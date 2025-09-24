@@ -27,6 +27,7 @@ class _LanguageSelectionViewState extends State<LanguageSelectionView> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          //Upper Image View
           Stack(
             clipBehavior: Clip.none,
             alignment: Alignment.bottomCenter,
@@ -62,6 +63,8 @@ class _LanguageSelectionViewState extends State<LanguageSelectionView> {
             ],
           ),
           Gap(60),
+
+          //Language Selection
           Column(
             children: [
               Text(l10n.languageSelectionTitle, style: theme.textTheme.headlineMedium),
@@ -105,6 +108,7 @@ class _LanguageSelectionViewState extends State<LanguageSelectionView> {
   }
 }
 
+// Language Selection Tile
 class _LanguageTile extends StatelessWidget {
   const _LanguageTile({required this.language});
 

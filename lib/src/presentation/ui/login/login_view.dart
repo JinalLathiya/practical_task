@@ -8,7 +8,6 @@ import 'package:practical/src/core/extensions/extensions.dart';
 import 'package:practical/src/data/repository/comman_repository.dart';
 import 'package:practical/src/localization/generated/l10n.dart';
 import 'package:practical/src/presentation/resources/assets.dart';
-import 'package:practical/src/presentation/resources/log.dart';
 import 'package:practical/src/presentation/resources/size_constants.dart';
 import 'package:practical/src/presentation/resources/svg_icon.dart';
 
@@ -64,18 +63,19 @@ class _LoginViewBuilder extends State<LoginViewBuilder> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool _isPasswordVisible = false;
 
   @override
   Widget build(BuildContext context) {
     final theme = context.theme;
     final l10n = AppLocalizations.of(context);
-    bool _isPasswordVisible = false;
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          //Upper Image View
           Stack(
             clipBehavior: Clip.none,
             alignment: Alignment.bottomCenter,
@@ -111,6 +111,8 @@ class _LoginViewBuilder extends State<LoginViewBuilder> {
             ],
           ),
           Gap(60),
+
+          //Login Form
           Padding(
             padding: EdgeInsets.symmetric(horizontal: Spacing.normal),
             child: Form(
@@ -140,28 +142,25 @@ class _LoginViewBuilder extends State<LoginViewBuilder> {
                     ),
                   ),
                   Gap(20),
-                  BlocBuilder<LoginBloc, LoginState>(
-                    builder: (BuildContext context, LoginState state) {
-                      return TextFormField(
-                        controller: _passwordController,
-                        obscureText: !_isPasswordVisible,
-                        obscuringCharacter: '●',
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        validator: (value) => validatePassword(value, context),
-                        onTapOutside: (event) => FocusScope.of(context).unfocus(),
-                        textInputAction: TextInputAction.done,
-                        decoration: InputDecoration(
-                          hintText: l10n.passwordHintText,
-                          suffixIcon: IconButton(
-                            onPressed: () {
-                              _isPasswordVisible = !_isPasswordVisible;
-                              Log.debug("_isPasswordVisible => $_isPasswordVisible");
-                            },
-                            icon: SvgIcon(_isPasswordVisible ? SvgIcons.eyeIcon : SvgIcons.slashEyeIcon),
-                          ),
-                        ),
-                      );
-                    },
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: !_isPasswordVisible,
+                    obscuringCharacter: '●',
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    validator: (value) => validatePassword(value, context),
+                    onTapOutside: (event) => FocusScope.of(context).unfocus(),
+                    textInputAction: TextInputAction.done,
+                    decoration: InputDecoration(
+                      hintText: l10n.passwordHintText,
+                      suffixIcon: IconButton(
+                        iconSize: 24,
+                        onPressed: () {
+                          _isPasswordVisible = !_isPasswordVisible;
+                          setState(() {});
+                        },
+                        icon: SvgIcon(_isPasswordVisible ? SvgIcons.eyeIcon : SvgIcons.slashEyeIcon),
+                      ),
+                    ),
                   ),
                   Gap(40),
                 ],
@@ -187,6 +186,7 @@ class _LoginViewBuilder extends State<LoginViewBuilder> {
   }
 }
 
+// Validation of Fields
 String? validatePassword(String? value, BuildContext context) {
   if (value == null) {
     return null;

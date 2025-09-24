@@ -19,6 +19,7 @@ class _HomeViewState extends State<HomeView> {
     return Scaffold(
       body: Column(
         children: [
+          //Appbar
           Container(
             height: 120,
             padding: EdgeInsets.only(left: Spacing.normal, right: Spacing.normal, top: Spacing.xxLarge),
@@ -62,12 +63,14 @@ class _HomeViewState extends State<HomeView> {
               ],
             ),
           ),
+
           Expanded(
             child: SingleChildScrollView(
               padding: EdgeInsets.all(Spacing.normal),
               child: Column(
                 spacing: Spacing.normal,
                 children: [
+                  // Search Text Field
                   Card(
                     elevation: 4,
                     child: TextField(
@@ -88,13 +91,15 @@ class _HomeViewState extends State<HomeView> {
                       ),
                     ),
                   ),
+
+                  //Static Listview
                   ListView.separated(
                     padding: EdgeInsets.only(bottom: Spacing.xLarge),
                     physics: NeverScrollableScrollPhysics(),
                     itemCount: 5,
                     shrinkWrap: true,
                     scrollDirection: Axis.vertical,
-                    itemBuilder: (context, index) => _dataTile(),
+                    itemBuilder: (context, index) => _DataTile(),
                     separatorBuilder: (context, index) => Gap(Spacing.normal),
                   ),
                 ],
@@ -107,6 +112,7 @@ class _HomeViewState extends State<HomeView> {
   }
 }
 
+// Logout Bottom Sheet Layout
 class LogoutBottomSheet extends StatelessWidget {
   const LogoutBottomSheet({super.key});
 
@@ -151,8 +157,9 @@ class LogoutBottomSheet extends StatelessWidget {
   }
 }
 
-class _dataTile extends StatelessWidget {
-  const _dataTile();
+//Listview Tile
+class _DataTile extends StatelessWidget {
+  const _DataTile();
 
   @override
   Widget build(BuildContext context) {
