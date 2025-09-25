@@ -24,85 +24,88 @@ class _LanguageSelectionViewState extends State<LanguageSelectionView> {
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          //Upper Image View
-          Stack(
-            clipBehavior: Clip.none,
-            alignment: Alignment.bottomCenter,
-            children: [
-              Container(
-                height: 240,
-                width: MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.vertical(bottom: Radius.circular(200)),
-                  image: DecorationImage(
-                    image: AssetImage(AppImages.bgImage),
-                    fit: BoxFit.cover,
-                    alignment: Alignment.center,
-                    colorFilter: ColorFilter.mode(theme.colorScheme.primary.withOpacity(0.5), BlendMode.color),
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: -25,
-                child: Container(
-                  height: 100,
-                  width: 100,
+      body: SingleChildScrollView(
+        padding: EdgeInsetsGeometry.directional(bottom: Spacing.large),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            //Upper Image View
+            Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.bottomCenter,
+              children: [
+                Container(
+                  height: 240,
+                  width: MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(30)),
-                    boxShadow: [
-                      BoxShadow(color: theme.shadowColor.withOpacity(0.2), blurRadius: 8, offset: Offset(0, 4)),
-                    ],
-                  ),
-                  child: Image.asset(AppImages.appIcon),
-                ),
-              ),
-            ],
-          ),
-          Gap(60),
-
-          //Language Selection
-          Column(
-            children: [
-              Text(l10n.languageSelectionTitle, style: theme.textTheme.headlineMedium),
-              Gap(8),
-              Text(
-                l10n.languageSelectionContent,
-                style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-              ),
-              Gap(40),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: Spacing.normal),
-                child: RadioGroup(
-                  groupValue: selectedLanguage,
-                  onChanged: (value) {
-                    if (value != null) {
-                      context.read<LocalizationBloc>().add(LocalizationUpdated(language: value));
-                    }
-                  },
-                  child: Column(
-                    spacing: 20,
-                    children: [
-                      _LanguageTile(language: Language.english),
-                      _LanguageTile(language: Language.hindi),
-                    ],
+                    borderRadius: BorderRadius.vertical(bottom: Radius.circular(200)),
+                    image: DecorationImage(
+                      image: AssetImage(AppImages.bgImage),
+                      fit: BoxFit.cover,
+                      alignment: Alignment.center,
+                      colorFilter: ColorFilter.mode(theme.colorScheme.primary.withOpacity(0.5), BlendMode.color),
+                    ),
                   ),
                 ),
-              ),
-              Gap(40),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: Spacing.normal),
-            child: ElevatedButton(
-              onPressed: () => Navigator.of(context).pushNamed('/login'),
-              child: Text(l10n.continueButtonLabel),
+                Positioned(
+                  bottom: -25,
+                  child: Container(
+                    height: 100,
+                    width: 100,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(30)),
+                      boxShadow: [
+                        BoxShadow(color: theme.shadowColor.withOpacity(0.2), blurRadius: 8, offset: Offset(0, 4)),
+                      ],
+                    ),
+                    child: Image.asset(AppImages.appIcon),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
+            Gap(60),
+        
+            //Language Selection
+            Column(
+              children: [
+                Text(l10n.languageSelectionTitle, style: theme.textTheme.headlineMedium),
+                Gap(Spacing.normal),
+                Text(
+                  l10n.languageSelectionContent,
+                  style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                ),
+                Gap(Spacing.xLarge),
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: Spacing.normal),
+                  child: RadioGroup(
+                    groupValue: selectedLanguage,
+                    onChanged: (value) {
+                      if (value != null) {
+                        context.read<LocalizationBloc>().add(LocalizationUpdated(language: value));
+                      }
+                    },
+                    child: Column(
+                      spacing: Spacing.large,
+                      children: [
+                        _LanguageTile(language: Language.english),
+                        _LanguageTile(language: Language.hindi),
+                      ],
+                    ),
+                  ),
+                ),
+                Gap(Spacing.xxxLarge),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: Spacing.normal),
+              child: ElevatedButton(
+                onPressed: () => Navigator.of(context).pushNamed('/login'),
+                child: Text(l10n.continueButtonLabel),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

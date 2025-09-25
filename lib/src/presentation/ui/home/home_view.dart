@@ -14,6 +14,8 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
+  final TextEditingController _searchController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,7 +68,12 @@ class _HomeViewState extends State<HomeView> {
 
           Expanded(
             child: SingleChildScrollView(
-              padding: EdgeInsets.all(Spacing.normal),
+              padding: EdgeInsets.only(
+                left: Spacing.normal,
+                right: Spacing.normal,
+                top: Spacing.normal,
+                bottom: Spacing.large,
+              ),
               child: Column(
                 spacing: Spacing.normal,
                 children: [
@@ -74,6 +81,7 @@ class _HomeViewState extends State<HomeView> {
                   Card(
                     elevation: 4,
                     child: TextField(
+                      controller: _searchController,
                       onTapOutside: (event) => FocusScope.of(context).unfocus(),
                       textInputAction: TextInputAction.search,
                       decoration: InputDecoration(
@@ -84,17 +92,13 @@ class _HomeViewState extends State<HomeView> {
                         ),
                         fillColor: Colors.white,
                         filled: true,
-                        border: OutlineInputBorder(
-                          borderRadius: ShapeBorderRadius.medium,
-                          borderSide: BorderSide.none,
-                        ),
+                        border: OutlineInputBorder(borderRadius: ShapeBorderRadius.medium, borderSide: BorderSide.none),
                       ),
                     ),
                   ),
 
                   //Static Listview
                   ListView.separated(
-                    padding: EdgeInsets.only(bottom: Spacing.xLarge),
                     physics: NeverScrollableScrollPhysics(),
                     itemCount: 5,
                     shrinkWrap: true,

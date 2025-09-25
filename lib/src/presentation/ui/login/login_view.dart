@@ -72,115 +72,118 @@ class _LoginViewBuilder extends State<LoginViewBuilder> {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          //Upper Image View
-          Stack(
-            clipBehavior: Clip.none,
-            alignment: Alignment.bottomCenter,
-            children: [
-              Container(
-                height: 240,
-                width: MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.vertical(bottom: Radius.circular(200)),
-                  image: DecorationImage(
-                    image: AssetImage(AppImages.bgImage),
-                    fit: BoxFit.cover,
-                    alignment: Alignment.center,
-                    colorFilter: ColorFilter.mode(theme.colorScheme.primary.withOpacity(0.5), BlendMode.color),
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: -25,
-                child: Container(
-                  height: 100,
-                  width: 100,
+      body: SingleChildScrollView(
+        padding: EdgeInsetsGeometry.directional(bottom: Spacing.large),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            //Upper Image View
+            Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.bottomCenter,
+              children: [
+                Container(
+                  height: 240,
+                  width: MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(30)),
-                    boxShadow: [
-                      BoxShadow(color: theme.shadowColor.withOpacity(0.2), blurRadius: 8, offset: Offset(0, 4)),
-                    ],
+                    borderRadius: BorderRadius.vertical(bottom: Radius.circular(200)),
+                    image: DecorationImage(
+                      image: AssetImage(AppImages.bgImage),
+                      fit: BoxFit.cover,
+                      alignment: Alignment.center,
+                      colorFilter: ColorFilter.mode(theme.colorScheme.primary.withOpacity(0.5), BlendMode.color),
+                    ),
                   ),
-                  child: Image.asset(AppImages.appIcon),
+                ),
+                Positioned(
+                  bottom: -25,
+                  child: Container(
+                    height: 100,
+                    width: 100,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(30)),
+                      boxShadow: [
+                        BoxShadow(color: theme.shadowColor.withOpacity(0.2), blurRadius: 8, offset: Offset(0, 4)),
+                      ],
+                    ),
+                    child: Image.asset(AppImages.appIcon),
+                  ),
+                ),
+              ],
+            ),
+            Gap(60),
+
+            //Login Form
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: Spacing.normal),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    Text(l10n.loginScreenTitle, style: theme.textTheme.headlineMedium),
+                    Gap(Spacing.normal),
+                    Text(
+                      l10n.loginScreenContent,
+                      style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                    ),
+                    Gap(Spacing.xLarge),
+                    TextFormField(
+                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.next,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      onTapOutside: (event) => FocusScope.of(context).unfocus(),
+                      validator: (value) => validateEmail(value, context),
+                      decoration: InputDecoration(
+                        hintText: l10n.emailHintText,
+                        suffixIcon: Padding(
+                          padding: const EdgeInsets.all(Spacing.medium),
+                          child: SvgIcon(SvgIcons.emailIcon, size: 18),
+                        ),
+                      ),
+                    ),
+                    Gap(Spacing.large),
+                    TextFormField(
+                      controller: _passwordController,
+                      obscureText: !_isPasswordVisible,
+                      obscuringCharacter: '●',
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (value) => validatePassword(value, context),
+                      onTapOutside: (event) => FocusScope.of(context).unfocus(),
+                      textInputAction: TextInputAction.done,
+                      decoration: InputDecoration(
+                        hintText: l10n.passwordHintText,
+                        suffixIcon: IconButton(
+                          iconSize: 24,
+                          onPressed: () {
+                            _isPasswordVisible = !_isPasswordVisible;
+                            setState(() {});
+                          },
+                          icon: SvgIcon(_isPasswordVisible ? SvgIcons.eyeIcon : SvgIcons.slashEyeIcon),
+                        ),
+                      ),
+                    ),
+                    Gap(Spacing.xxxLarge),
+                  ],
                 ),
               ),
-            ],
-          ),
-          Gap(60),
-
-          //Login Form
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: Spacing.normal),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  Text(l10n.loginScreenTitle, style: theme.textTheme.headlineMedium),
-                  Gap(8),
-                  Text(
-                    l10n.loginScreenContent,
-                    style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-                  ),
-                  Gap(30),
-                  TextFormField(
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    textInputAction: TextInputAction.next,
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    onTapOutside: (event) => FocusScope.of(context).unfocus(),
-                    validator: (value) => validateEmail(value, context),
-                    decoration: InputDecoration(
-                      hintText: l10n.emailHintText,
-                      suffixIcon: Padding(
-                        padding: const EdgeInsets.all(Spacing.medium),
-                        child: SvgIcon(SvgIcons.emailIcon, size: 18),
-                      ),
-                    ),
-                  ),
-                  Gap(20),
-                  TextFormField(
-                    controller: _passwordController,
-                    obscureText: !_isPasswordVisible,
-                    obscuringCharacter: '●',
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    validator: (value) => validatePassword(value, context),
-                    onTapOutside: (event) => FocusScope.of(context).unfocus(),
-                    textInputAction: TextInputAction.done,
-                    decoration: InputDecoration(
-                      hintText: l10n.passwordHintText,
-                      suffixIcon: IconButton(
-                        iconSize: 24,
-                        onPressed: () {
-                          _isPasswordVisible = !_isPasswordVisible;
-                          setState(() {});
-                        },
-                        icon: SvgIcon(_isPasswordVisible ? SvgIcons.eyeIcon : SvgIcons.slashEyeIcon),
-                      ),
-                    ),
-                  ),
-                  Gap(40),
-                ],
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    context.read<LoginBloc>().add(
+                      OnLoginRequested(email: _emailController.text.trim(), password: _passwordController.text.trim()),
+                    );
+                  }
+                },
+                child: Text(l10n.signInButtonLabel),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: ElevatedButton(
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  context.read<LoginBloc>().add(
-                    OnLoginRequested(email: _emailController.text.trim(), password: _passwordController.text.trim()),
-                  );
-                }
-              },
-              child: Text(l10n.signInButtonLabel),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

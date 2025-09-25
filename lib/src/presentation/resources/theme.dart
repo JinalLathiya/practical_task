@@ -83,12 +83,6 @@ class AppTheme {
       final defaultBorder = OutlineInputBorder(borderRadius: ShapeBorderRadius.medium, borderSide: BorderSide.none);
 
       if (states.contains(WidgetState.error)) {
-        if (states.contains(WidgetState.hovered)) {
-          return defaultBorder.copyWith(borderSide: BorderSide(color: colorScheme.error, width: 2));
-        }
-        if (states.contains(WidgetState.focused)) {
-          return defaultBorder.copyWith(borderSide: BorderSide(color: colorScheme.error, width: 2));
-        }
         return defaultBorder.copyWith(borderSide: BorderSide(color: colorScheme.error, width: 2));
       }
       if (states.contains(WidgetState.hovered)) {
@@ -131,7 +125,6 @@ class AppTheme {
       floatingLabelBehavior: FloatingLabelBehavior.always,
       fillColor: fillColor,
       filled: true,
-      errorBorder: border,
     );
   }
 
