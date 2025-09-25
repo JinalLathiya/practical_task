@@ -1,16 +1,22 @@
-# practical
+# Practical Task
 
-A new Flutter project.
+### Development Environment
 
-## Getting Started
+* Dart Sdk: >= 3.9.0
+* Flutter Sdk: >= 3.35.0
 
-This project is a starting point for a Flutter application.
+### Prerequisite for running app
 
-A few resources to get you started if this is your first Flutter project:
+For generating Execute required json serialization, database & dependency injection files, run below command in root
+directory of project:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+```shell
+dart run build_runner build -d
+``` 
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+For generating localization files run below commands in root directory of project:
+
+```shell
+flutter pub global activate intl_utils
+flutter pub global run intl_utils:generate
+``` 
